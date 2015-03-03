@@ -4,6 +4,8 @@
 #include <unistd.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
+#include <wiringPi.h>
+#include <arpa/inet.h>
 
 #define MAX 2
 #define PORT 9000
@@ -13,11 +15,13 @@ char quit[] = "exit";
 
 int numClient = 0;
 
-main()
+void light(int n);
+
+int main()
 {
 	int connSock;
 	struct sockaddr_in s_addr;
-	int len, i , n;
+	int  n;
 	char serverAddr[] = "52.11.52.152";
 
 	char rcvBuffer[BUFSIZ], sbuf[BUFSIZ];
@@ -67,8 +71,16 @@ main()
 		{
 			if( ( n = read(connSock, rcvBuffer, sizeof(rcvBuffer))) != 0 )
 			{
-				rcvBuffer[n] = '\0';
 				printf("%s",rcvBuffer);
+
+				if( rcvBuffer[0] == 'l' && rcvBuffer[1] == '0')
+				{
+					light(0);
+				}
+				else if( rcvBuffer[0] == 'l' && rcvBuffer[1] == '1')
+				{
+					light(1);
+				}	
 			}
 			if( strncmp(rcvBuffer,quit,4) == 0 )
 				break;
@@ -76,4 +88,25 @@ main()
 		
 	}
 	
+	return 0;
 }
+
+void light(int n)
+{
+	wiringPiSetup();
+
+	pinMode(7,OUTPUT);
+
+	if( n == 1 )
+	{
+		digitalWrite(7,1);
+		digitalWrite(7,0);
+	}
+	else
+	{
+		digitalWrite(7,0);
+		digitalWrite(7,1);
+	}
+	printf("light excute\n");
+}
+
