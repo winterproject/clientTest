@@ -80,7 +80,23 @@ int main()
 				else if( rcvBuffer[0] == 'l' && rcvBuffer[1] == '1')
 				{
 					light(1);
-				}	
+				} // WOL 	
+				else if( rcvBuffer[0] == 'p' && rcvBuffer[1] == '1')
+				{
+					printf("aa");
+					char buff[BUFSIZ];
+					FILE *fp;
+	
+					fp = popen("wakeonlan D0:50:99:1D:47:AE","r");
+
+					if( NULL == fp)
+						perror("wol fail\n");
+
+					while(fgets(buff,BUFSIZ,fp))
+						printf("%s",buff);
+
+					pclose(fp);
+				}
 			}
 			if( strncmp(rcvBuffer,quit,4) == 0 )
 				break;
